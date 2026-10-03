@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>Ферма Ютуберов</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#79c85a;color:#fff}header{padding:16px;text-align:center;background:#4b9b35;position:sticky;top:0;z-index:5}h1{margin:0 0 6px;font-size:24px}.balance{font-size:20px;font-weight:700}.tabs{display:flex;gap:7px;padding:10px;background:#397c29;position:sticky;top:75px;z-index:4}.tabs button{flex:1;border:0;border-radius:12px;padding:12px 4px;font-weight:700;background:#fff;color:#333}.tabs button.active{background:#ffd83d}.page{display:none;padding:15px;max-width:600px;margin:auto}.page.active{display:block}.card{background:#fff;color:#222;border-radius:18px;padding:16px;margin-bottom:12px;box-shadow:0 5px 12px #0002}.youtuber{text-align:center;font-size:65px}.name{text-align:center;font-size:20px;font-weight:700;margin:5px}.rarity{text-align:center;margin:7px}.price{text-align:center;font-size:17px;margin:6px}.action{width:100%;padding:13px;margin-top:9px;border:0;border-radius:12px;background:#45b649;color:#fff;font-size:17px;font-weight:700}.action:active{transform:scale(.98)}.empty{text-align:center;padding:35px 10px;font-size:18px}.progress{height:14px;background:#ddd;border-radius:20px;overflow:hidden;margin:12px 0}.progress div{height:100%;background:#45b649;transition:.3s}.small{font-size:14px;color:#666;text-align:center}
+</style>
+</head>
+<body>
+<header><h1>🌱 Ферма Ютуберов</h1><div class="balance">💰 <span id="money">1000</span></div></header>
+<div class="tabs"><button class="active" onclick="openPage('farm',this)">🌱 Ферма</button><button onclick="openPage('stock',this)">🛒 Сток</button><button onclick="openPage('sell',this)">🏪 Продажа</button></div>
+<section id="farm" class="page active"><div id="farmContent"></div></section>
+<section id="stock" class="page">
+<div class="card"><div class="youtuber">🧑</div><div class="name">Обычный Ютубер</div><div class="rarity">⚪ Обычный — 50%</div><div class="price">💰 Цена: 100</div><button class="action" onclick="buy('common')">🛒 Купить</button></div>
+<div class="card"><div class="youtuber">🔵</div><div class="name">Редкий Ютубер</div><div class="rarity">🔵 Редкий — 25%</div><div class="price">💰 Цена: 250</div><button class="action" onclick="buy('rare')">🛒 Купить</button></div>
+<div class="card"><div class="youtuber">🟣</div><div class="name">Эпический Ютубер</div><div class="rarity">🟣 Эпический — 15%</div><div class="price">💰 Цена: 500</div><button class="action" onclick="buy('epic')">🛒 Купить</button></div>
+<div class="card"><div class="youtuber">🟠</div><div class="name">Легендарный Ютубер</div><div class="rarity">🟠 Легендарный — 8%</div><div class="price">💰 Цена: 1000</div><button class="action" onclick="buy('legendary')">🛒 Купить</button></div>
+<div class="card"><div class="youtuber">🔴</div><div class="name">Мифический Ютубер</div><div class="rarity">🔴 Мифический — 2%</div><div class="price">💰 Цена: 2500</div><button class="action" onclick="buy('mythic')">🛒 Купить</button></div>
+</section>
+<section id="sell" class="page"><div id="sellContent"></div></section>
+<script>
+const types={common:{name:'Обычный Ютубер',emoji:'🧑',rarity:'⚪ Обычный',price:100,baseSell:150},rare:{name:'Редкий Ютубер',emoji:'🔵',rarity:'🔵 Редкий',price:250,baseSell:400},epic:{name:'Эпический Ютубер',emoji:'🟣',rarity:'🟣 Эпический',price:500,baseSell:800},legendary:{name:'Легендарный Ютубер',emoji:'🟠',rarity:'🟠 Легендарный',price:1000,baseSell:1800},mythic:{name:'Мифический Ютубер',emoji:'🔴',rarity:'🔴 Мифический',price:2500,baseSell:5000}};
+let data=JSON.parse(localStorage.getItem('ytFarmSave')||'null')||{money:1000,youtuber:null,size:0};
+function save(){localStorage.setItem('ytFarmSave',JSON.stringify(data))}function updateMoney(){document.getElementById('money').textContent=data.money}
+function openPage(page,button){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));document.getElementById(page).classList.add('active');document.querySelectorAll('.tabs button').forEach(x=>x.classList.remove('active'));button.classList.add('active');if(page==='farm')renderFarm();if(page==='sell')renderSell()}
+function buy(type){if(data.youtuber){alert('Сначала вырасти или продай текущего Ютубера!');return}let t=types[type];if(data.money<t.price){alert('Недостаточно денег!');return}data.money-=t.price;data.youtuber=type;data.size=0;save();updateMoney();renderFarm();alert('Ютубер куплен! 🌱')}
+function grow(){if(!data.youtuber){alert('Сначала купи Ютубера в Стоке!');return}if(data.size>=3){alert('Ютубер уже полностью вырос! 🌳');return}data.size++;save();renderFarm()}
+function sizeInfo(){if(data.size===0)return['🌱','Маленький',25];if(data.size===1)return['🌿','Подросший',50];if(data.size===2)return['🌳','Большой',75];return['🌲','Огромный',100]}
+function renderFarm(){let el=document.getElementById('farmContent');if(!data.youtuber){el.innerHTML='<div class="card"><div class="empty">🌱<br><br>Ферма пустая.<br>Зайди в 🛒 Сток и купи Ютубера.</div></div>';return}let t=types[data.youtuber],s=sizeInfo();el.innerHTML=`<div class="card"><div class="youtuber">${s[0]}</div><div class="name">${t.name}</div><div class="rarity">${t.rarity}</div><div class="price">📏 Размер: ${s[1]}</div><div class="progress"><div style="width:${s[2]}%"></div></div><div class="small">Рост: ${data.size}/3</div><button class="action" onclick="grow()">⏩ Вырастить</button></div>`}
+function renderSell(){let el=document.getElementById('sellContent');if(!data.youtuber){el.innerHTML='<div class="empty">🏪<br><br>У тебя нет Ютуберов для продажи.</div>';return}let t=types[data.youtuber],s=sizeInfo(),sell=Math.floor(t.baseSell*[1,1.5,2,3][data.size]);el.innerHTML=`<div class="card"><div class="youtuber">${s[0]}</div><div class="name">${t.name}</div><div class="rarity">${t.rarity}</div><div class="price">📏 Размер: ${s[1]}</div><div class="price">💰 Цена продажи: ${sell}</div><button class="action" onclick="sell(${sell})">💰 Продать</button></div>`}
+function sell(price){data.money+=price;data.youtuber=null;data.size=0;save();updateMoney();renderSell();renderFarm();alert('Ютубер продан! 💰')}
+updateMoney();renderFarm();
+</script>
+</body>
+</html>
